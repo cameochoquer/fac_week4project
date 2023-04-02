@@ -1,12 +1,33 @@
-import {Octokit} from 'octokit'
+const companies = [
+  'foundersandcoders',
+  'orangejellyfish',
+  'tldraw',
+  'policyinpractice',
+  'soon_',
+]
 
-const octokit = new Octokit({})
+const orgName = 'foundersandcoders'
 
-///
-const newResponse = await octokit.request('GET /repos/{owner}/{repo}/issues', {
-  owner: 'github',
-  repo: 'docs',
-  per_page: 2,
-})
+fetch(`https://api.github.com/orgs/${orgName}`)
+  .then((response) => {
+    if (response.status === 404) {
+      throw new Error('Org not found')
+    }
+    return response.json() // Access the response using json() method
+  })
+  .then((org) => {
+    console.log(`this is ${org.name}`)
+  })
 
-console.log(newResponse.data)
+fetch(`https://api.github.com/orgs/${orgName}/members`)
+  .then((response) => {
+    if (response.status === 404) {
+      throw new Error('Org not found')
+    }
+    return response.json() // Access the response using json() method
+  })
+  .then((members) => {
+    members.forEach((member) => {
+      console.log(member.login)
+    })
+  })
