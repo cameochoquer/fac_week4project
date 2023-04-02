@@ -7,19 +7,11 @@ const companies = [
   'thisissoon',
 ]
 
-// const selectElement = document.getElementById('companies')
-
 const createNewCard = (company) => {
   const cardTemplate = document.getElementById('company-card')
   const card = cardTemplate.content.cloneNode(true)
   card.querySelector('h1').textContent = company
 }
-
-// companies.forEach((company) => {
-//   const optionElement = document.createElement('option')
-//   optionElement.innerText = company
-//   selectElement.appendChild(optionElement)
-// })
 
 function fetchCompanyInfo(company) {
   return new Promise((resolve, reject) => {
@@ -63,14 +55,26 @@ Promise.all(companies.slice(1).map((company) => fetchCompanyInfo(company)))
     companyInfoArray.forEach((company) => {
       const card = document.createElement('div')
       card.className = 'card'
-      const h1 = document.createElement('h1')
+      const h1 = document.createElement('h2')
       h1.textContent = company.name
       card.appendChild(h1)
 
       Object.keys(company).forEach((key) => {
         if (key !== 'name' && company[key] !== null) {
           const p = document.createElement('p')
-          p.textContent = `${key}: ${company[key]}`
+          p.className = key
+          if (key === 'twitter_username') {
+            const i = document.createElement('i')
+            i.className = 'fab fa-twitter'
+            const span = document.createElement('span')
+            span.textContent = ` ${company[key]}`
+            p.appendChild(i)
+            p.appendChild(span)
+          } else if (typeof company[key] === 'number') {
+            p.textContent = `${key}: ${company[key]}`
+          } else {
+            p.textContent = `${company[key]}`
+          }
           card.appendChild(p)
         }
       })

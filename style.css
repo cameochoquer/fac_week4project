@@ -8,6 +8,9 @@ html {
 body {
   color: white;
 }
+h2 {
+  color: coral;
+}
 
 #company-container {
   display: flex;
@@ -16,17 +19,16 @@ body {
 }
 .card {
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: column wrap;
   border: 2px;
   border-color: rgb(247, 97, 3);
   border-style: solid;
-  justify-content: space-between;
+  justify-content: space-evenly
+  text-align: left;
   width: 300px;
   padding: 10px;
   margin-top: 10px;
 }
 .card:hover {
   box-shadow: 0 0 10px rgba(240, 107, 70, 0.641);
-}
-.info {
 }
