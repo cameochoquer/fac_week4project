@@ -11,22 +11,23 @@ body {
 h2 {
   color: coral;
 }
-a{
-    color: white;
-    text-decoration: none;
+a {
+  color: white;
+  text-decoration: none;
 }
-a:hover{
-    color: darkgoldenrod;
+a:hover {
+  color: darkgoldenrod;
 }
 a:visited {
-    color: cyan;
-    text-decoration: none;
+  color: cyan;
+  text-decoration: none;
 }
 
 #company-container {
   display: flex;
   flex-flow: row wrap;
   justify-content: space-between;
+  align-items: flex-start;
 }
 .card {
   display: flex;
@@ -34,12 +35,17 @@ a:visited {
   border: 2px;
   border-color: rgb(247, 97, 3);
   border-style: solid;
-  justify-content: space-evenly
+  justify-content: flex-start;
   text-align: left;
   width: 300px;
   padding: 10px;
   margin: 10px;
+  background-color: rgb(24, 38, 68);
 }
 .card:hover {
   box-shadow: 0 0 10px rgba(240, 107, 70, 0.641);
+}
+.show-users {
+  align-self: flex-end;
+  width: inherit;
 }

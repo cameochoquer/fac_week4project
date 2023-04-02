@@ -196,7 +196,9 @@ Promise.all(companies.slice(1).map((company) => fetchCompanyInfo(company)))
           if (userInfo.length > 0) {
             // If the company has more than 5 users, add a button to show/hide user information
             const button = document.createElement('button')
-            button.textContent = 'Show users'
+            button.className = 'show-users'
+
+            button.textContent = 'Show Members'
             button.addEventListener('click', () => {
               userDiv.style.display =
                 userDiv.style.display === 'none' ? 'block' : 'none'
