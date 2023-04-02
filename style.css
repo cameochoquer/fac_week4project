@@ -1,0 +1,32 @@
+* {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 100;
+}
+html {
+  background-color: rgb(47, 69, 116);
+}
+body {
+  color: white;
+}
+
+#company-container {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+}
+.card {
+  display: flex;
+  flex-flow: row wrap;
+  border: 2px;
+  border-color: rgb(247, 97, 3);
+  border-style: solid;
+  justify-content: space-between;
+  width: 300px;
+  padding: 10px;
+  margin-top: 10px;
+}
+.card:hover {
+  box-shadow: 0 0 10px rgba(240, 107, 70, 0.641);
+}
+.info {
+}
