@@ -11,6 +11,17 @@ body {
 h2 {
   color: coral;
 }
+a{
+    color: white;
+    text-decoration: none;
+}
+a:hover{
+    color: darkgoldenrod;
+}
+a:visited {
+    color: cyan;
+    text-decoration: none;
+}
 
 #company-container {
   display: flex;
@@ -27,7 +38,7 @@ h2 {
   text-align: left;
   width: 300px;
   padding: 10px;
-  margin-top: 10px;
+  margin: 10px;
 }
 .card:hover {
   box-shadow: 0 0 10px rgba(240, 107, 70, 0.641);

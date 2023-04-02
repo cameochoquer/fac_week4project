@@ -6,14 +6,9 @@ const companies = [
   'policy-in-practice',
   'thisissoon',
 ]
+const container = document.getElementById('company-container')
 
-const createNewCard = (company) => {
-  const cardTemplate = document.getElementById('company-card')
-  const card = cardTemplate.content.cloneNode(true)
-  card.querySelector('h1').textContent = company
-}
-
-function fetchCompanyInfo(company) {
+const fetchCompanyInfo = (company) => {
   return new Promise((resolve, reject) => {
     fetch(`https://api.github.com/orgs/${company}`)
       .then((response) => {
@@ -31,6 +26,7 @@ function fetchCompanyInfo(company) {
           email,
           public_repos,
           twitter_username,
+          blog,
         } = org
         const companyInfo = {
           name,
@@ -40,6 +36,7 @@ function fetchCompanyInfo(company) {
           email,
           public_repos,
           twitter_username,
+          blog,
         }
         resolve(companyInfo)
       })
@@ -48,7 +45,6 @@ function fetchCompanyInfo(company) {
       })
   })
 }
-const container = document.getElementById('company-container')
 
 Promise.all(companies.slice(1).map((company) => fetchCompanyInfo(company)))
   .then((companyInfoArray) => {
@@ -66,10 +62,24 @@ Promise.all(companies.slice(1).map((company) => fetchCompanyInfo(company)))
           if (key === 'twitter_username') {
             const i = document.createElement('i')
             i.className = 'fab fa-twitter'
+            const a = document.createElement('a')
+            a.href = `https://twitter.com/${company[key]}`
+            a.target = '_blank'
+            a.rel = 'noopener noreferrer'
             const span = document.createElement('span')
-            span.textContent = ` ${company[key]}`
-            p.appendChild(i)
-            p.appendChild(span)
+            span.textContent = ` @${company[key]}`
+            a.appendChild(i)
+            a.appendChild(span)
+            p.appendChild(a)
+          } else if (key === 'blog') {
+            const a = document.createElement('a')
+            a.href = `${company[key]}`
+            a.target = '_blank'
+            a.rel = 'noopener noreferrer'
+            const span = document.createElement('span')
+            span.textContent = ` 🔗 Website`
+            a.appendChild(span)
+            p.appendChild(a)
           } else if (typeof company[key] === 'number') {
             p.textContent = `${key}: ${company[key]}`
           } else {
@@ -80,9 +90,44 @@ Promise.all(companies.slice(1).map((company) => fetchCompanyInfo(company)))
       })
 
       container.appendChild(card)
-      console.log(company)
     })
   })
   .catch((error) => {
     console.error(error)
   })
+
+const fetchUserInfo = (company, page = 1, perPage = 80) => {
+  const apiUrl = `https://api.github.com/orgs/${company}/members?page=${page}&per_page=${perPage}`
+  return new Promise((resolve, reject) => {
+    fetch(apiUrl)
+      .then((response) => {
+        if (response.status === 404) {
+          throw new Error('User not found')
+        }
+        return response.json()
+      })
+      .then((users) => {
+        const companyUserInfos = users.map((user) => {
+          const {login, avatar_url, url} = user
+          return {
+            login,
+            avatar_url,
+            url,
+          }
+        })
+        resolve(companyUserInfos)
+      })
+      .catch((error) => {
+        console.error(error)
+        reject(error)
+      })
+  })
+}
+
+fetchUserInfo('foundersandcoders', 1, 80)
+
+Promise.all(
+  companies.slice(1).map((company) => fetchUserInfo(company, 1, 80))
+).then((userInfoArray) => {
+  console.log(userInfoArray)
+})
