@@ -45,7 +45,7 @@ a:visited {
 .card:hover {
   box-shadow: 0 0 10px rgba(240, 107, 70, 0.641);
 }
-.show-users {
+.show-members {
   align-self: flex-end;
   width: inherit;
 }
