@@ -4,14 +4,7 @@ const octokit = new Octokit({
   auth: key,
 })
 
-octokit
-  .paginate('GET /repos/{owner}/{repo}/issues', {
-    owner: 'cameochoquer',
-    repo: 'FAC_tldraw_challenge',
-  })
-  .then((issueTitles) => {
-    console.log(issueTitles.length)
-  })
+///
 const companies = [
   'foundersandcoders',
   'orangejellyfish',
@@ -22,75 +15,61 @@ const companies = [
 const container = document.getElementById('company-container')
 
 const fetchCompanyInfo = (company) => {
-  return new Promise((resolve, reject) => {
-    fetch(`https://api.github.com/orgs/${company}`)
-      .then((response) => {
-        if (response.status === 404) {
-          throw new Error('Org not found')
-        }
-        return response.json()
-      })
-      .then((org) => {
-        const {
-          name,
-          description,
-          followers,
-          location,
-          email,
-          public_repos,
-          twitter_username,
-          blog,
-        } = org
-        const companyInfo = {
-          name,
-          description,
-          followers,
-          location,
-          email,
-          public_repos,
-          twitter_username,
-          blog,
-        }
-        resolve(companyInfo)
-      })
-      .catch((error) => {
-        reject(error)
-      })
-  })
+  return octokit.orgs
+    .get({
+      org: company,
+    })
+    .then(({data}) => {
+      const {
+        name,
+        description,
+        followers,
+        location,
+        email,
+        public_repos,
+        twitter_username,
+        blog,
+      } = data
+      const companyInfo = {
+        name,
+        description,
+        followers,
+        location,
+        email,
+        public_repos,
+        twitter_username,
+        blog,
+      }
+      return companyInfo
+    })
+    .catch((error) => {
+      console.error(error)
+      throw new Error('Org note found')
+    })
 }
 
-const fetchMemberInfo = (company, page = 1, perPage = 80) => {
-  return new Promise((resolve, reject) => {
-    fetch(
-      `https://api.github.com/orgs/${company}/members?page=${page}&per_page=${perPage}`
-    )
-      .then((response) => {
-        if (response.status === 404) {
-          throw new Error('User not found')
-        }
-        return response.json()
+const fetchMemberInfo = (company, page = 1, perpage = 80) => {
+  return octokit.orgs
+    .listMembers({
+      org: company,
+      per_page: perpage,
+      page: page,
+    })
+    .then(({data}) => {
+      const companyMemberInfos = data.map((member) => {
+        const {login, avatar_url, html_url} = member
+        return {login, avatar_url, html_url}
       })
-      .then((members) => {
-        const companyMemberInfos = members.map((member) => {
-          const {login, avatar_url, html_url} = member
-          return {
-            login,
-            avatar_url,
-            html_url,
-          }
-        })
-        resolve(companyMemberInfos)
-      })
-      .catch((error) => {
-        console.error(error)
-        reject(error)
-      })
-  })
+      return companyMemberInfos
+    })
+    .catch((error) => {
+      console.error(error)
+      throw new Error('User not found')
+    })
 }
 
 Promise.all(companies.map((company) => fetchCompanyInfo(company)))
   .then((companyInfoArray) => {
-    // Create a card for each company
     companyInfoArray.forEach((company, index) => {
       const card = document.createElement('div')
       card.className = 'card'
@@ -184,3 +163,22 @@ Promise.all(companies.map((company) => fetchCompanyInfo(company)))
   .catch((error) => {
     console.error(error)
   })
+
+const username = 'cameochoquer'
+const response = await octokit.repos.listForUser({
+  username: username,
+})
+let allRepoNames = []
+
+for (const repo of response.data) {
+  allRepoNames.push(repo.name)
+}
+
+allRepoNames.forEach(async (repoName) => {
+  const response = await octokit.repos.listCommits({
+    owner: username,
+    repo: repoName,
+  })
+  const commitCount = response.data.length
+  console.log(`Repository ${repoName} has ${commitCount} commits.`)
+})
