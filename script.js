@@ -1,4 +1,4 @@
-import {key} from './key.js'
+import {key} from './.gitignore/key.js'
 import {Octokit} from 'https://cdn.skypack.dev/@octokit/rest'
 const octokit = new Octokit({
   auth: key,
