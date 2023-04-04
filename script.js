@@ -1,3 +1,17 @@
+import {key} from './key.js'
+import {Octokit} from 'https://cdn.skypack.dev/@octokit/rest'
+const octokit = new Octokit({
+  auth: key,
+})
+
+octokit
+  .paginate('GET /repos/{owner}/{repo}/issues', {
+    owner: 'cameochoquer',
+    repo: 'FAC_tldraw_challenge',
+  })
+  .then((issueTitles) => {
+    console.log(issueTitles.length)
+  })
 const companies = [
   'foundersandcoders',
   'orangejellyfish',
