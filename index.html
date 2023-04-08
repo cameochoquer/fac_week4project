@@ -12,12 +12,13 @@
     <title>Github User Info</title>
   </head>
   <body>
-    <header>
-      <input type="text" id="user-name" />
-      <label for="user-name">user name</label>
-    </header>
-    <div id="company-container"></div>
-    <canvas id="myChart" style="width: 100%; max-width: 700px"></canvas>
+    <header></header>
+    <input type="text" id="search" placeholder="Search Github usernames" />
+    <div id="results"></div>
+    <div id="loading">
+      <div class="spinner"></div>
+    </div>
+    <canvas id="chart" style="width: 100%; max-width: 700px"></canvas>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
     <script type="module" src="script.js"></script>
   </body>
