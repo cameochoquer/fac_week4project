@@ -11,8 +11,8 @@ const searchInput = document.getElementById('search')
 const results = document.getElementById('results')
 const loadingSpinner = document.getElementById('loading')
 
-const gitNames = async () => {
-  const username = searchInput.value
+const gitNames = async (query) => {
+  const username = query
 
   const nameResponse = await octokit.rest.search.users({
     q: `${username} in:login`,
@@ -50,7 +50,15 @@ const getUserData = async (event) => {
     if (currentChart) {
       currentChart.destroy()
     }
-    await getChartData(username) // function to create the chart
+
+    const chartData = await getChartData(username)
+
+    createChart(
+      chartData,
+      'Commits per Repository',
+      'Repository Name',
+      'Number of Commits'
+    )
   }
 }
 
@@ -60,12 +68,11 @@ const getChartData = async (username) => {
   context.clearRect(0, 0, canvas.width, canvas.height)
 
   loadingSpinner.style.display = 'block'
-
+  let repoLabels = []
+  let commitData = []
   const response = await octokit.repos.listForUser({
     username: username,
   })
-  const labels = []
-  const data = []
 
   for (const repo of response.data) {
     const repoName = repo.name
@@ -83,8 +90,8 @@ const getChartData = async (username) => {
 
       const commitCount = commitResponse.data.length
 
-      labels.push(repoName)
-      data.push(commitCount)
+      repoLabels.push(repoName)
+      commitData.push(commitCount)
     } catch (error) {
       if (
         error.status === 409 &&
@@ -99,6 +106,14 @@ const getChartData = async (username) => {
       }
     }
   }
+  return {labels: repoLabels, data: commitData}
+}
+
+searchInput.addEventListener('keydown', searchfunction)
+results.addEventListener('click', getUserData)
+
+const createChart = async (chartData, chartTitle, yAxisLabel, xAxisLabel) => {
+  const {labels, data} = chartData
 
   let colourArray = []
 
@@ -106,11 +121,11 @@ const getChartData = async (username) => {
     let hexCode = '#' + Math.random().toString(16).substring(2, 8)
     colourArray.push(hexCode)
   })
-  const chartType = window.innerWidth < 450 ? 'pie' : 'bar' // Check screen size
+  const chartType = window.innerWidth < 450 ? 'pie' : 'bar'
 
   const datasets = [
     {
-      label: 'Commits',
+      label: chartTitle,
       backgroundColor: colourArray,
       data: data,
     },
@@ -118,10 +133,10 @@ const getChartData = async (username) => {
   loadingSpinner.style.display = 'none'
 
   currentChart = new Chart('chart', {
-    type: 'horizontalBar', // Use horizontal bar chart type
+    type: 'horizontalBar',
     data: {
       datasets: datasets,
-      labels: labels, // Swap labels and data arrays
+      labels: labels,
     },
     options: {
       legend: {
@@ -129,7 +144,7 @@ const getChartData = async (username) => {
       },
       title: {
         display: true,
-        text: 'Commits per Repository',
+        text: chartTitle,
         fontColor: 'white',
         fontSize: window.innerWidth < 450 ? 10 : 16,
       },
@@ -149,7 +164,7 @@ const getChartData = async (username) => {
             },
             scaleLabel: {
               display: true,
-              labelString: 'Repository Name',
+              labelString: yAxisLabel,
               fontColor: 'white',
               fontSize: window.innerWidth < 450 ? 10 : 16,
             },
@@ -160,16 +175,16 @@ const getChartData = async (username) => {
             ticks: {
               beginAtZero: true,
               fontColor: 'white',
-              fontSize: window.innerWidth < 450 ? 10 : 16, // Adjust font size based on screen size
+              fontSize: window.innerWidth < 450 ? 10 : 16,
             },
             gridLines: {
               color: 'rgba(255, 255, 255, 0.2)',
             },
             scaleLabel: {
               display: true,
-              labelString: 'Number of Commits',
+              labelString: xAxisLabel,
               fontColor: 'white',
-              fontSize: window.innerWidth < 450 ? 10 : 16, // Adjust font size based on screen size
+              fontSize: window.innerWidth < 450 ? 10 : 16,
             },
           },
         ],
@@ -177,46 +192,3 @@ const getChartData = async (username) => {
     },
   })
 }
-
-//   currentChart = new Chart('chart', {
-//     type: chartType,
-//     data: {
-//       labels: labels,
-//       datasets: datasets,
-//     },
-//     options: {
-//       legend: {
-//         display: chartType === 'pie',
-//         position: 'bottom',
-//         labels: {
-//           fontColor: 'white',
-//           fontSize: window.innerWidth < 450 ? 10 : 16,
-//         },
-//       },
-//       title: {
-//         display: true,
-//         text: 'Commits per Repository',
-//         fontColor: 'white',
-//       },
-//       responsive: true,
-//       maintainAspectRatio: false,
-//       aspectRatio: window.innerWidth < 450 ? 1 : 2,
-//       scales:
-//         chartType === 'bar'
-//           ? {
-//               yAxes: [{ticks: {beginAtZero: true, fontColor: 'white'}}],
-//               xAxes: [
-//                 {
-//                   ticks: {
-//                     fontColor: 'white',
-//                   },
-//                 },
-//               ],
-//             }
-//           : undefined,
-//     },
-//   })
-// }
-
-searchInput.addEventListener('keydown', searchfunction)
-results.addEventListener('click', getUserData)
