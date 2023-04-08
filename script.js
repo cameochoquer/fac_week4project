@@ -13,7 +13,6 @@ const loadingSpinner = document.getElementById('loading')
 
 const gitNames = async () => {
   const username = searchInput.value
-  loadingSpinner.style.display = 'block'
 
   const nameResponse = await octokit.rest.search.users({
     q: `${username} in:login`,
@@ -23,7 +22,6 @@ const gitNames = async () => {
   data.items.forEach((item) => {
     searchResult += `<div class="search-result" data-username="${item.login}">${item.login}</div>`
   })
-  loadingSpinner.style.display = 'none'
 
   results.innerHTML = searchResult
 }
@@ -108,6 +106,7 @@ const getChartData = async (username) => {
     let hexCode = '#' + Math.random().toString(16).substring(2, 8)
     colourArray.push(hexCode)
   })
+  const chartType = window.innerWidth < 450 ? 'pie' : 'bar' // Check screen size
 
   const datasets = [
     {
@@ -119,10 +118,10 @@ const getChartData = async (username) => {
   loadingSpinner.style.display = 'none'
 
   currentChart = new Chart('chart', {
-    type: 'bar',
+    type: 'horizontalBar', // Use horizontal bar chart type
     data: {
-      labels: labels,
       datasets: datasets,
+      labels: labels, // Swap labels and data arrays
     },
     options: {
       legend: {
@@ -132,13 +131,45 @@ const getChartData = async (username) => {
         display: true,
         text: 'Commits per Repository',
         fontColor: 'white',
+        fontSize: window.innerWidth < 450 ? 10 : 16,
       },
+      responsive: true,
+      aspectRatio: 1.5,
+      maintainAspectRatio: true,
       scales: {
-        yAxes: [{ticks: {beginAtZero: true, fontColor: 'white'}}],
+        yAxes: [
+          {
+            ticks: {
+              beginAtZero: true,
+              fontColor: 'white',
+              fontSize: window.innerWidth < 450 ? 10 : 16,
+            },
+            gridLines: {
+              color: 'rgba(255, 255, 255, 0.2)',
+            },
+            scaleLabel: {
+              display: true,
+              labelString: 'Repository Name',
+              fontColor: 'white',
+              fontSize: window.innerWidth < 450 ? 10 : 16,
+            },
+          },
+        ],
         xAxes: [
           {
             ticks: {
+              beginAtZero: true,
               fontColor: 'white',
+              fontSize: window.innerWidth < 450 ? 10 : 16, // Adjust font size based on screen size
+            },
+            gridLines: {
+              color: 'rgba(255, 255, 255, 0.2)',
+            },
+            scaleLabel: {
+              display: true,
+              labelString: 'Number of Commits',
+              fontColor: 'white',
+              fontSize: window.innerWidth < 450 ? 10 : 16, // Adjust font size based on screen size
             },
           },
         ],
@@ -146,6 +177,46 @@ const getChartData = async (username) => {
     },
   })
 }
+
+//   currentChart = new Chart('chart', {
+//     type: chartType,
+//     data: {
+//       labels: labels,
+//       datasets: datasets,
+//     },
+//     options: {
+//       legend: {
+//         display: chartType === 'pie',
+//         position: 'bottom',
+//         labels: {
+//           fontColor: 'white',
+//           fontSize: window.innerWidth < 450 ? 10 : 16,
+//         },
+//       },
+//       title: {
+//         display: true,
+//         text: 'Commits per Repository',
+//         fontColor: 'white',
+//       },
+//       responsive: true,
+//       maintainAspectRatio: false,
+//       aspectRatio: window.innerWidth < 450 ? 1 : 2,
+//       scales:
+//         chartType === 'bar'
+//           ? {
+//               yAxes: [{ticks: {beginAtZero: true, fontColor: 'white'}}],
+//               xAxes: [
+//                 {
+//                   ticks: {
+//                     fontColor: 'white',
+//                   },
+//                 },
+//               ],
+//             }
+//           : undefined,
+//     },
+//   })
+// }
 
 searchInput.addEventListener('keydown', searchfunction)
 results.addEventListener('click', getUserData)
